@@ -23,10 +23,31 @@ app.get("/", (req, res) => {
 });
 
 // =========================
+// 🔥 SOCKET.IO
+// =========================
+const http = require("http").createServer(app);
+
+const io = require("socket.io")(http, {
+  cors: { origin: "*" },
+});
+
+io.on("connection", (socket) => {
+  console.log("✅ User connecté");
+
+  socket.on("sendMessage", (data) => {
+    io.emit("receiveMessage", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ User déconnecté");
+  });
+});
+
+// =========================
 // 🚀 SERVER
 // =========================
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
