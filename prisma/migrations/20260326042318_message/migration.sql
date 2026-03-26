@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "senderId" TEXT NOT NULL,
+    "receiverId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "seen" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

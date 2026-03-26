@@ -208,3 +208,63 @@ exports.stats = async (req, res) => {
     res.status(500).json({ error: "Erreur stats" });
   }
 };
+// =========================
+// 💬 ENVOYER MESSAGE
+// =========================
+exports.sendMessage = async (req, res) => {
+  const { senderId, receiverId, content } = req.body;
+
+  const message = await prisma.message.create({
+    data: { senderId, receiverId, content },
+  });
+
+  res.json(message);
+};
+
+// =========================
+// 📜 HISTORIQUE
+// =========================
+exports.getMessages = async (req, res) => {
+  const { user1, user2 } = req.query;
+
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: user1, receiverId: user2 },
+        { senderId: user2, receiverId: user1 },
+      ],
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  res.json(messages);
+};
+
+// =========================
+// 👁️ MARQUER COMME VU
+// =========================
+exports.markAsSeen = async (req, res) => {
+  const { senderId, receiverId } = req.body;
+
+  await prisma.message.updateMany({
+    where: {
+      senderId,
+      receiverId,
+      seen: false,
+    },
+    data: { seen: true },
+  });
+
+  res.json({ message: "Messages vus" });
+};
+// 🔔 SAVE PUSH TOKEN
+exports.savePushToken = async (req, res) => {
+  const { userId, token } = req.body;
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { pushToken: token },
+  });
+
+  res.json({ message: "Token sauvegardé" });
+};
