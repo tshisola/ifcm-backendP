@@ -16,14 +16,7 @@ app.use(express.json());
 app.use("/api", require("./src/routes"));
 
 // =========================
-// 🧪 ROUTE TEST
-// =========================
-app.get("/", (req, res) => {
-  res.send("🚀 API IFCM fonctionne sur Render !");
-});
-
-// =========================
-// 🔥 SOCKET.IO
+// 🔥 SOCKET.IO PRIVÉ
 // =========================
 const http = require("http").createServer(app);
 
@@ -34,8 +27,15 @@ const io = require("socket.io")(http, {
 io.on("connection", (socket) => {
   console.log("✅ User connecté");
 
-  socket.on("sendMessage", (data) => {
-    io.emit("receiveMessage", data);
+  // 🔐 rejoindre une room
+  socket.on("joinRoom", (userId) => {
+    socket.join(userId);
+    console.log("User rejoint room:", userId);
+  });
+
+  // 💬 message privé
+  socket.on("privateMessage", ({ to, message }) => {
+    io.to(to).emit("receiveMessage", message);
   });
 
   socket.on("disconnect", () => {
